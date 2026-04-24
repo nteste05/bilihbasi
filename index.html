@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="canonical" href="https://nteste05.github.io/bilihbasi/" />
+    <link rel="icon" type="image/jpeg" href="bilihbasi-favicon.jpeg" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="bilihbasi-favicon.jpeg">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>BilihBasi: Game Permainan mini game lucu dan seru di browser</title>
+    <meta name="description" content="Mainkan BilihBasi, koleksi mini game lucu dan seru gratis di browser! Nikmati 5 game asik: Tangkap Bakpao, Tumpuk Makanan, Ayo Menari, Pukul Kelinci, dan Balap Mobil Gila. Tanpa download, tanpa ribet, mainkan sekarang dan cetak skor tertinggimu!">
+    <meta name="keywords" content="BilihBasi, Game browser lucu, Mini game seru gratis, Permainan anak online, Game tanpa download">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nteste05.github.io/bilihbasi">
+    <meta property="og:title" content="BilihBasi: Game Permainan mini game lucu dan seru di browser">
+    <meta property="og:description" content="Mainkan BilihBasi, koleksi mini game lucu dan seru gratis di browser! Nikmati 5 game asik: Tangkap Bakpao, Tumpuk Makanan, Ayo Menari, Pukul Kelinci, dan Balap Mobil Gila. Tanpa download, tanpa ribet, mainkan sekarang dan cetak skor tertinggimu!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/nteste05/bilihbasi/refs/heads/main/bilihbasi-thumb.jpeg">
+    
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nteste05.github.io/bilihbasi">
+    <meta property="twitter:title" content="BilihBasi: Game Permainan mini game lucu dan seru di browser">
+    <meta property="twitter:description" content="Mainkan BilihBasi, koleksi mini game lucu dan seru gratis di browser! Nikmati 5 game asik: Tangkap Bakpao, Tumpuk Makanan, Ayo Menari, Pukul Kelinci, dan Balap Mobil Gila. Tanpa download, tanpa ribet, mainkan sekarang dan cetak skor tertinggimu!">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/nteste05/bilihbasi/refs/heads/main/bilihbasi-thumb.jpeg">
+    <style>
+        body { margin: 0; background: #6200ea; font-family: 'Arial Black', sans-serif; overflow: hidden; color: white; text-align: center; user-select: none}
+        canvas { display: none; margin: 0 auto; background: #ffeb3b; border-bottom: 10px solid #4527a0; }
+        
+        #ui-top { position: absolute; top: 10px; width: 100%; pointer-events: none; display: none; }
+        .stats { font-size: 20px; text-shadow: 2px 2px #000; }
+        
+        #crowd-container { 
+            position: absolute; bottom: 120px; width: 100%; 
+            font-size: 35px; transition: 0.2s; pointer-events: none; display: none;
+        }
+        
+        .btn-container { position: absolute; bottom: 20px; width: 100%; display: none; justify-content: center; gap: 15px; }
+        .game-btn { 
+            width: 75px; height: 75px; border-radius: 50%; border: 4px solid #000; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-size: 30px; box-shadow: 0 6px #333; transition: 0.1s;
+        }
+        .game-btn:active { transform: translateY(4px); box-shadow: 0 2px #333; }
+        #btn-red { background: #ff1744; }
+        #btn-blue { background: #2979ff; }
+        #btn-green { background: #00e676; }
+        
+        #menu-utama { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #6200ea; z-index: 100; }
+        .pilih-btn { background: #ffeb3b; color: #000; padding: 15px 30px; margin: 10px; border: 4px solid #000; border-radius: 15px; cursor: pointer; font-size: 20px; width: 260px; }
+        
+        .navbar {
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 0 10px 0 0;
+        }
+        
+        header h1 {
+            font-size: 16px;
+            margin:0;
+            color: white;
+        }
+        
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            background-color: #6200ea;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 10px;
+        }
+        
+        .sidebar a {
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+            border-bottom: 1px solid #bbb;
+        }
+        
+        .sidebar a:hover {
+            color: #888;
+            background-color: #7200ea;
+        }
+        
+        .sidebar .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 36px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .overlaynav {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1500;
+        }
+        
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu-utama">
+        <div id="mySidebar" class="sidebar">
+        <span class="close-btn" onclick="closeNav()">&times;</span>
+        <a href="https://nteste05.github.io/gemii/" onclick="closeNav()">👽 Lainnya</a>
+        <a href="https://pinterest.com/nteste05" onclick="closeNav()"><img src="pinterest.svg" width="25" height="25" alt="pinterest"> Pinterest</a>
+        <a href="https://x.com/nteste05" onclick="closeNav()"><img src="x.svg" width="25" height="25" alt="x"> X</a>
+    </div>
+    <div id="overlaynav" class="overlaynav" onclick="closeNav()"></div>
+    <nav class="navbar">
+        <div class="menu-btn" onclick="openNav()">&#9776;</div>
+        <header><h1>BilihBasi: Game Permainan mini</h1></header>
+    </nav>
+        <h2>PILIH GAME</h2>
+        <button class="pilih-btn" onclick="pilihGame(1)">🥟 Tangkap Bakpao</button>
+        <button class="pilih-btn" onclick="pilihGame(2)">🍱 Tumpuk Makanan</button>
+        <button class="pilih-btn" onclick="pilihGame(3)">🕺 Ayo Menari</button>
+        <button class="pilih-btn" onclick="pilihGame(4)">🧹 Pukul Kelinci</button>
+        <button class="pilih-btn" onclick="pilihGame(5)">🏎️ Balap Gila</button>
+    </div>
+    <div id="ui-top">
+        <div class="stats" id="lives">❤️❤️❤️</div>
+        <div class="stats" id="score">SKOR: 0</div>
+        <h2 id="msg" style="color: #000; background: white; display: inline-block; padding: 5px 15px; border-radius: 10px;">TANGKAP BAKPAO! 🥟</h2>
+    </div>
+    <div id="crowd-container">🧔👩🏼‍🦰👩🏿‍🦱👴🏻👴🏻👵</div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="btn-container">
+        <div id="btn-red" class="game-btn">🔴</div>
+        <div id="btn-blue" class="game-btn">🔵</div>
+        <div id="btn-green" class="game-btn">🟢</div>
+    </div>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const msgEl = document.getElementById('msg');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const crowdEl = document.getElementById('crowd-container');
+    const menu = document.getElementById('menu-utama');
+    const ui = document.getElementById('ui-top');
+    const btns = document.querySelector('.btn-container');
+    
+    let mode = 0;
+    function pilihGame(n) {
+        mode = n;
+        menu.style.display = "none";
+        canvas.style.display = "block";
+        ui.style.display = "block";
+        crowdEl.style.display = "block";
+        btns.style.display = "flex";
+        
+        canvas.width = window.innerWidth > 500 ? 400 : window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        if(n === 1) jalankanGame1();
+        if(n === 2) jalankanGame2();
+        if(n === 3) jalankanGame3();
+        if(n === 4) jalankanGame4();
+        if(n === 5) jalankanGame5();
+    }
+    
+    function jalankanGame1() {
+        canvas.width = window.innerWidth > 500 ? 400 : window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let score = 0;
+        let lives = 3;
+        let itemY = -50;
+        let speed = 5;
+        let targetY = canvas.height - 250;
+        let isGameOver = false;
+        
+        const items = [
+            { emoji: "🥟", type: "good" },
+            { emoji: "🥟", type: "good" },
+            { emoji: "🥟", type: "good" },
+            { emoji: "💨", type: "bad" }
+        ];
+        let currentItem = items[0];
+        
+        function draw() {
+            if (isGameOver) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, targetY, 50, 0, Math.PI * 2);
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = currentItem.type === "good" ? "#333" : "#8b4513"; 
+            ctx.stroke();
+            ctx.font = "60px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(currentItem.emoji, canvas.width / 2, itemY + 20);
+            itemY += speed;
+            if (itemY > canvas.height) {
+                if (currentItem.type === "good") { triggerFail("LEWAT! 🥟💨"); } 
+                else { msgEl.innerText = "PINTAR! ITU KENTUT 💨"; msgEl.style.color = "green"; score += 5; scoreEl.innerText = "SKOR: " + score; }
+                spawnItem();
+            }
+            requestAnimationFrame(draw);
+        }
+        
+        function checkHit() {
+            if (isGameOver) return;
+            let dist = Math.abs(itemY - targetY);
+            if (dist < 50) { 
+                if (currentItem.type === "good") {
+                    score += 10; speed += 0.3; scoreEl.innerText = "SKOR: " + score;
+                    msgEl.innerText = "MANTAP! ✨"; msgEl.style.color = "blue"; spawnItem();
+                } else { triggerFail("IUUHH! TANGKAP KENTUT! 🤢"); spawnItem(); }
+            } else { triggerFail("KECEPETAN! ❌"); }
+        }
+        
+        function spawnItem() { itemY = -50; currentItem = items[Math.floor(Math.random() * items.length)]; }
+        
+        function triggerFail(text) {
+            lives--;
+            livesEl.innerText = "❤️".repeat(lives > 0 ? lives : 0);
+            msgEl.innerText = text; msgEl.style.color = "red";
+            crowdEl.innerText = "🤣😂🤣😂🤣"; crowdEl.style.transform = "scale(1.4) rotate(5deg)";
+            setTimeout(() => { if (!isGameOver) { crowdEl.innerText = "🧔👩🏼‍🦰👩🏿‍🦱👴🏻👵"; crowdEl.style.transform = "scale(1) rotate(0deg)"; } }, 1000);
+            if (lives <= 0) gameOver();
+        }
+        
+        function gameOver() {
+            isGameOver = true;
+            msgEl.innerText = "MALU-MALUIN! 💀";
+            setTimeout(() => { alert("Game Over!\nSkor Akhir: " + score); location.reload(); }, 100);
+        }
+        
+        document.querySelectorAll('.game-btn').forEach(btn => {
+            ['mousedown', 'touchstart'].forEach(evt => btn.addEventListener(evt, (e) => { 
+                if(mode === 1) { e.preventDefault(); checkHit(); }
+            }));
+        });
+        
+        draw();
+    }
+    
+    function jalankanGame2() {
+        msgEl.innerText = "CEPAT TUMPUK! ⏳";
+        canvas.style.background = "#fff9c4"; 
+        
+        let stack = []; 
+        let targets = []; 
+        let foodTypes = [
+            { emoji: "🍔", btn: "red" },
+            { emoji: "🍙", btn: "blue" },
+            { emoji: "🍕", btn: "green" }
+        ];
+        
+        let score = 0;
+        let lives = 3;
+        let gameSelesai = false;
+        
+        let maxTime = 5000;
+        let currentTime = maxTime;
+        let lastTimestamp = 0;
+        
+        function generateTargets() {
+            targets = [];
+            for(let i = 0; i < 5; i++) {
+                targets.push(foodTypes[Math.floor(Math.random() * foodTypes.length)]);
+            }
+        }
+        generateTargets();
+        
+        function draw(timestamp) {
+            if(gameSelesai) return;
+            
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            let deltaTime = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+            
+            currentTime -= deltaTime;
+            
+            if (currentTime <= 0) {
+                triggerWrong("WAKTU HABIS! ⏰");
+                currentTime = maxTime; 
+            }
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.fillRect(0, 120, canvas.width, 110);
+            
+            let barWidth = (currentTime / maxTime) * canvas.width;
+            ctx.fillStyle = currentTime < 1000 ? "#ff1744" : "#ffeb3b";
+            ctx.fillRect(0, 225, barWidth, 10);
+            
+            ctx.font = "40px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#000";
+            
+            let spacing = 50;
+            let startX = canvas.width / 2 - (spacing * 2);
+            
+            targets.forEach((t, i) => {
+                ctx.fillText(t.emoji, startX + (i * spacing), 180);
+            });
+            
+            ctx.font = "30px Arial";
+            ctx.fillText("👇", startX, 145);
+            
+            ctx.fillStyle = "#8d6e63";
+            ctx.fillRect(50, canvas.height - 100, canvas.width - 100, 20);
+            
+            stack.forEach((f, i) => {
+                ctx.font = "60px Arial";
+                ctx.fillText(f.emoji, canvas.width / 2, (canvas.height - 130) - (i * 35));
+            });
+            requestAnimationFrame(draw);
+        }
+        
+        function triggerWrong(reason) {
+            lives--;
+            livesEl.innerText = "❤️".repeat(lives > 0 ? lives : 0);
+            msgEl.innerText = reason;
+            msgEl.style.color = "red";
+            
+            
+            crowdEl.innerText = "🤣😂🤣😂🤣";
+            crowdEl.style.transform = "scale(1.4) rotate(5deg)";
+            setTimeout(() => {
+                if (!gameSelesai) {
+                    crowdEl.innerText = "🧔👩🏼‍🦰👩🏿‍🦱👴🏻👵";
+                    crowdEl.style.transform = "scale(1) rotate(0deg)";
+                }
+            }, 800);
+            
+            if(lives <= 0) {
+                gameSelesai = true;
+                alert("GAME OVER! 💀\nSkor Akhir: " + score);
+                location.reload();
+            }
+        }
+        
+        const handleInput = (btnColor) => {
+            if(mode !== 2 || gameSelesai) return;
+            
+            if(btnColor === targets[0].btn) {
+                
+                stack.push(targets[0]);
+                targets.shift(); 
+                score += 10;
+                scoreEl.innerText = "SKOR: " + score;
+                msgEl.innerText = "MANTAP! 😋";
+                msgEl.style.color = "blue";
+                
+                if (maxTime > 2000) maxTime -= 200;
+                currentTime = maxTime;
+                
+                if(targets.length === 0) generateTargets();
+                if(stack.length > 15) stack.shift(); 
+            } else {
+                triggerWrong("SALAH TEKAN! 🤢");
+            }
+        };
+        
+        const btnsMap = {'btn-red': 'red', 'btn-blue': 'blue', 'btn-green': 'green'};
+        Object.keys(btnsMap).forEach(id => {
+            const el = document.getElementById(id);
+            el.onmousedown = () => handleInput(btnsMap[id]);
+            el.ontouchstart = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+        });
+        requestAnimationFrame(draw);
+    }
+    
+    function jalankanGame3() {
+        msgEl.innerText = "IKUTI GERAKAN! 🕺";
+        canvas.style.background = "#311b92"; 
+        
+        let score = 0;
+        let lives = 3;
+        let streak = 0; 
+        let gameSelesai = false;
+        let isDancing = false; 
+        let flip = 1; 
+        
+        const moves = [
+            { arrow: "⬅️", btn: "red" },
+            { arrow: "⬆️", btn: "blue" },
+            { arrow: "➡️", btn: "green" }
+        ];
+        
+        let currentTarget = moves[Math.floor(Math.random() * moves.length)];
+        let timer = 3000;
+        let baseTime = 3000;
+        let lastTime = 0;
+        
+        function draw(timestamp) {
+            if(gameSelesai) return;
+            if (!lastTime) lastTime = timestamp;
+            let delta = timestamp - lastTime;
+            lastTime = timestamp;
+            if (!isDancing) {
+                timer -= delta;
+            }
+            if (timer <= 0 && !isDancing) {
+                hukumanSalah("TERLAMBAT! ⏱️");
+                resetGerakan();
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.textAlign = "center";
+            ctx.translate(canvas.width / 2, canvas.height / 2 + 50);
+            if (isDancing) {
+                flip = Math.sin(timestamp / 100) > 0 ? 1 : -1;
+                ctx.scale(flip, 1);
+                ctx.font = "110px Arial";
+                ctx.fillText("🕺", 0, Math.sin(timestamp / 50) * 15);
+            } else {
+                ctx.font = "100px Arial";
+                ctx.fillText("🕴️", 0, 0); 
+            }
+            ctx.restore();
+            
+            if (!isDancing) {
+                ctx.font = "bold 80px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.fillText(currentTarget.arrow, canvas.width / 2, canvas.height / 2 - 120);
+                
+                let currentMax = Math.max(1200, baseTime - (score * 3));
+                let barWidth = (timer / currentMax) * canvas.width;
+                ctx.fillStyle = timer < 1000 ? "#ff1744" : "#00e676";
+                ctx.fillRect(0, 0, barWidth, 15);
+            } else {
+                ctx.font = "bold 30px Arial";
+                ctx.fillStyle = "yellow";
+                ctx.fillText("BONUS DANCE! ✨", canvas.width / 2, 100);
+            }
+            requestAnimationFrame(draw);
+        }
+        
+        function resetGerakan() {
+            currentTarget = moves[Math.floor(Math.random() * moves.length)];
+            let calculatedTime = baseTime - (score * 3); 
+            timer = Math.max(1200, calculatedTime);
+        }
+        
+        function hukumanSalah(teks) {
+            lives--;
+            streak = 0; 
+            isDancing = false;
+            livesEl.innerText = "❤️".repeat(lives > 0 ? lives : 0);
+            msgEl.innerText = teks;
+            msgEl.style.color = "red";
+            
+            crowdEl.innerText = "🤣😂🤣😂🤣";
+            crowdEl.style.transform = "scale(1.4) rotate(5deg)";
+            setTimeout(() => {
+                if (!gameSelesai) {
+                    crowdEl.innerText = "🧔👩🏼‍🦰👩🏿‍🦱👴🏻👵";
+                    crowdEl.style.transform = "scale(1) rotate(0deg)";
+                }
+            }, 800);
+            if(lives <= 0) {
+                gameSelesai = true;
+                alert("GAME OVER! Skor: " + score);
+                location.reload();
+            }
+        }
+        const handleInput = (color) => {
+            if(mode !== 3 || gameSelesai || isDancing) return;
+            if(color === currentTarget.btn) {
+                score += 10;
+                streak++;
+                scoreEl.innerText = "SKOR: " + score;
+                msgEl.innerText = "STREAK: " + streak + " 🔥";
+                
+                if (streak >= 5) {
+                    isDancing = true;
+                    msgEl.innerText = "MANTAP! GOYANG TERUS! 💃";
+                    msgEl.style.color = "#00ff00";
+                    
+                    setTimeout(() => { 
+                        isDancing = false; 
+                        streak = 0; 
+                        msgEl.innerText = "SIAP-SIAP! 🕴️";
+                        resetGerakan();
+                    }, 2000);
+                } else {
+                    msgEl.style.color = "yellow";
+                    resetGerakan();
+                }
+            } else {
+                hukumanSalah("SALAH! ❌");
+                resetGerakan();
+            }
+        };
+        const btnsMap = { 'btn-red': 'red', 'btn-blue': 'blue', 'btn-green': 'green' };
+        Object.keys(btnsMap).forEach(id => {
+            const el = document.getElementById(id);
+            el.onmousedown = () => handleInput(btnsMap[id]);
+            el.ontouchstart = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+        });
+        requestAnimationFrame(draw);
+    }
+    
+    function jalankanGame4() {
+        msgEl.innerText = "PUKUL KELINCINYA! 🐰🧹";
+        canvas.style.background = "#4caf50";
+        let score = 0;
+        let lives = 3;
+        let gameSelesai = false;
+        
+        const holes = [
+            { x: canvas.width * 0.2, btn: "red", content: null, timer: 0 },
+            { x: canvas.width * 0.5, btn: "blue", content: null, timer: 0 },
+            { x: canvas.width * 0.8, btn: "green", content: null, timer: 0 }
+        ];
+        
+        function spawnTarget() {
+            if(gameSelesai) return;
+            let activeHoles = holes.filter(h => h.content === null);
+            if(activeHoles.length > 0) {
+                let h = activeHoles[Math.floor(Math.random() * activeHoles.length)];
+                h.content = Math.random() > 0.3 ? "🐰" : "👩‍🦲";
+                h.timer = Math.max(600, 1500 - (score * 5));
+            }
+            setTimeout(spawnTarget, Math.random() * 1000 + 500);
+        }
+        spawnTarget();
+        function draw(timestamp) {
+            if(gameSelesai) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            holes.forEach(h => {
+                ctx.fillStyle = "#3e2723";
+                ctx.beginPath();
+                ctx.ellipse(h.x, canvas.height/2 + 50, 50, 20, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if(h.content) {
+                    ctx.font = "60px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(h.content, h.x, canvas.height/2 + 40);
+                    h.timer -= 16;
+                    if(h.timer <= 0) h.content = null;
+                }
+            });
+            requestAnimationFrame(draw);
+        }
+        
+        const handleInput = (color) => {
+            if(mode !== 4 || gameSelesai) return;
+            let targetHole = holes.find(h => h.btn === color);
+            
+            if(targetHole && targetHole.content === "🐰") {
+                score += 10;
+                scoreEl.innerText = "SKOR: " + score;
+                msgEl.innerText = "KENA! 🧹";
+                msgEl.style.color = "yellow";
+                targetHole.content = "💥"; 
+                setTimeout(() => { if(targetHole.content === "💥") targetHole.content = null; }, 200);
+            } else if(targetHole && targetHole.content === "👩‍🦲") {
+                targetHole.content = "😵";
+                hukumanPukul("ADUH! ORANG DIPUKUL! 😱");
+                setTimeout(() => { if(targetHole.content === "😵") targetHole.content = null; }, 500);
+            } else {
+                msgEl.innerText = "MELISET! 💨";
+                msgEl.style.color = "white";
+            }
+        };
+        
+        function hukumanPukul(teks) {
+            lives--;
+            livesEl.innerText = "❤️".repeat(lives > 0 ? lives : 0);
+            msgEl.innerText = teks;
+            msgEl.style.color = "red";
+            crowdEl.innerText = "🤣😂🤣😂🤣";
+            crowdEl.style.transform = "scale(1.4) rotate(5deg)";
+            setTimeout(() => {
+                if (!gameSelesai) {
+                    crowdEl.innerText = "🧔👩🏼‍🦰👩🏿‍🦱👴🏻👵";
+                    crowdEl.style.transform = "scale(1) rotate(0deg)";
+                }
+            }, 800);
+            if(lives <= 0) {
+                gameSelesai = true;
+                setTimeout(() => {
+                    alert("PECAT! 💀\nSkor: " + score);
+                    location.reload();
+                }, 100);
+            }
+        }
+        
+        const btnsMap = { 'btn-red': 'red', 'btn-blue': 'blue', 'btn-green': 'green' };
+        Object.keys(btnsMap).forEach(id => {
+            const el = document.getElementById(id);
+            el.onmousedown = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+            el.ontouchstart = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+        });
+        requestAnimationFrame(draw);
+    }
+    
+    function jalankanGame5() {
+        msgEl.innerText = "TEKAN 🔵 & 🟢 BERGANTIAN! 🏎️";
+        canvas.style.background = "#444"; 
+        
+        let score = 0;
+        let lives = 3;
+        let gameSelesai = false;
+        
+        let distance = 0; 
+        let speed = 0; 
+        let finishLine = 15000;
+        let lastBtn = "";
+        let isJumping = false;
+        
+        let obstacles = [];
+        
+        function spawnObstacle() {
+            if(gameSelesai) return;
+            obstacles.push({ y: -200 - (Math.random() * 300) });
+            let nextSpawn = Math.max(800, 2500 - (distance / 10));
+            setTimeout(spawnObstacle, nextSpawn);
+        }
+        spawnObstacle();
+        
+        function draw(timestamp) {
+            if(gameSelesai) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(255,255,255,0.5)";
+            ctx.setLineDash([40, 40]);
+            ctx.lineDashOffset = -distance;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, 0);
+            ctx.lineTo(canvas.width/2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = "50px Arial";
+            ctx.textAlign = "center";
+            
+            for(let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                ctx.fillText("🚧", canvas.width/2, obs.y);
+                obs.y += (speed + 4);
+                let carY = canvas.height - 150;
+                if(Math.abs(carY - obs.y) < 50 && !isJumping) {
+                    hukumanTabrak("HANCUR! 💥");
+                    obstacles.splice(i, 1);
+                    speed = 0;
+                }
+                if(obs.y > canvas.height) {
+                    obstacles.splice(i, 1);
+                    score += 5;
+                }
+            }
+            
+            ctx.save();
+            if(isJumping) {
+                ctx.font = "100px Arial";
+                ctx.fillText("🚀", canvas.width/2, canvas.height - 200); 
+            } else {
+                ctx.font = "80px Arial";
+                let shake = (speed > 10) ? Math.random() * (speed/3) : 0;
+                ctx.fillText("🏎️", canvas.width/2 + shake, canvas.height - 150);
+            }
+            ctx.restore();
+            
+            distance += speed;
+            if(speed > 0) speed *= 0.985;
+            
+            let progress = Math.min((distance / finishLine) * 100, 100);
+            scoreEl.innerText = "PROG: " + Math.floor(progress) + "%";
+            
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            ctx.fillRect(50, 10, canvas.width - 100, 10);
+            ctx.fillStyle = "#ffeb3b";
+            ctx.fillRect(50, 10, (progress/100) * (canvas.width - 100), 10);
+            
+            if(distance >= finishLine) {
+                gameSelesai = true;
+                alert("JUARA DUNIA! 🏆🏁\nSkor Akhir: " + (score + 100));
+                location.reload();
+            }
+            requestAnimationFrame(draw);
+        }
+        const handleInput = (color) => {
+            if(mode !== 5 || gameSelesai) return;
+            if(color === 'red') {
+                if(!isJumping) {
+                    isJumping = true;
+                    setTimeout(() => isJumping = false, 700);
+                }
+            } else {
+                if(color !== lastBtn) {
+                    speed += 1.2;
+                    if(speed > 35) speed = 35;
+                    lastBtn = color;
+                }
+            }
+        };
+        
+        function hukumanTabrak(teks) {
+            lives--;
+            livesEl.innerText = "❤️".repeat(lives > 0 ? lives : 0);
+            msgEl.innerText = teks;
+            msgEl.style.color = "red";
+            
+            crowdEl.innerText = "🤣😂🤣😂🤣";
+            crowdEl.style.transform = "scale(1.4) rotate(5deg)";
+            setTimeout(() => {
+                if (!gameSelesai) {
+                    crowdEl.innerText = "🧔👩🏼‍🦰👩🏿‍🦱👴🏻👵";
+                    crowdEl.style.transform = "scale(1) rotate(0deg)";
+                }
+            }, 800);
+            if(lives <= 0) {
+                gameSelesai = true;
+                alert("GAGAL TOTAL! 💀");
+                location.reload();
+            }
+        }
+        const btnsMap = { 'btn-red': 'red', 'btn-blue': 'blue', 'btn-green': 'green' };
+        Object.keys(btnsMap).forEach(id => {
+            const el = document.getElementById(id);
+            el.onmousedown = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+            el.ontouchstart = (e) => { e.preventDefault(); handleInput(btnsMap[id]); };
+        });
+        requestAnimationFrame(draw);
+    }
+    
+    const sidebar = document.getElementById("mySidebar");
+    const overlaynav = document.getElementById("overlaynav");
+    
+    function openNav() {
+        sidebar.style.width = "280px";
+        overlaynav.style.display = "block";
+            document.body.style.overflow = "hidden";
+    }
+    
+    function closeNav() {
+        sidebar.style.width = "0";
+        overlaynav.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+</script>
+<footer class="visually-hidden">
+    <p>&copy; 2026 <a style="color: inherit; text-decoration: none;" href="https://nteste05.github.io/bilihbasi/">BilihBasi: Game Permainan mini game lucu dan seru di browser.</a> All Rights Reserved.</p>
+    <p>BilihBasi: Mainkan Koleksi Mini Game Lucu & Seru Langsung di Browser Anda!<br><br>Mencari hiburan instan tanpa ribet? Selamat datang di BilihBasi, platform game browser terbaru yang menghadirkan kumpulan <strong>mini game lucu dan seru</strong> dalam satu tempat. Tidak perlu mengunduh aplikasi besar atau khawatir memori HP penuh, karena BilihBasi bisa Anda akses kapan saja melalui Google Chrome, Safari, atau browser favorit lainnya secara gratis!<br>BilihBasi dirancang khusus untuk Anda yang ingin mengisi waktu istirahat kantor, menunggu antrean, atau sekadar bersantai di rumah. Dengan kontrol yang sederhana dan visual yang menggemaskan, BilihBasi menawarkan pengalaman bermain game kasual yang adiktif bagi anak-anak maupun orang dewasa.</p>
+    <p>5 Mini Game Seru yang Wajib Anda Coba di BilihBasi<br>Keunggulan utama BilihBasi adalah variasi permainannya. Hanya dengan sekali klik, Anda bisa menikmati lima tantangan berbeda yang menguji ketangkasan dan kecepatan reaksi Anda:<br>Tangkap Bakpao (Reflex Challenge):<br>Siapkan tangan Anda untuk menangkap bakpao-bakpao putih nan empuk yang jatuh dari langit! Dalam game ini, koordinasi mata dan tangan sangat diuji. Pastikan Anda hanya menangkap bakpao yang enak dan hindari benda-benda aneh yang jatuh agar poin Anda tetap maksimal.<br>Tumpuk Makanan (Stacking Fun):<br>Seberapa tinggi Anda bisa menyusun burger atau kue? Di mini game tumpuk makanan ini, presisi adalah segalanya. Anda harus menjatuhkan bahan makanan tepat di tengah tumpukan sebelumnya. Semakin tinggi tumpukannya, semakin goyah kondisinya. Berani terima tantangannya?<br>Ayo Menari (Rhythm Game):<br>Ubah browser Anda menjadi lantai dansa! Ikuti irama musik yang ceria dan tekan tombol yang muncul sesuai tempo. Ayo Menari adalah game ritme yang tidak hanya menghibur tetapi juga efektif untuk melatih konsentrasi dan kepekaan terhadap musik.<br>Pukul Kelinci (Whack-a-Mole Style):<br>Kelinci-kelinci nakal mulai bermunculan di layar! Dalam game Pukul Kelinci yang legendaris ini, Anda harus bergerak cepat mengetuk layar atau mengklik mouse untuk memukul kelinci yang muncul dari lubang. Hati-hati, jangan sampai terkecoh oleh jebakan!<br>Balap Mobil Gila (Crazy Racing):<br>Ingin adrenalin yang lebih kencang? Coba Balap Mobil Gila! Kendalikan mobil kecil di lintasan yang penuh dengan rintangan tak masuk akal.</p>
+    <p>Mengapa Memilih Game Browser BilihBasi?<br>BilihBasi bukan sekadar permainan biasa. Sebagai web game modern, <strong>BilihBasi</strong> menawarkan kemudahan akses secara instant play. Anda cukup membuka URL, dan keseruan langsung dimulai. Fitur utama kami meliputi:<br>Tanpa Instalasi: Hemat ruang penyimpanan perangkat Anda.<br>Ringan & Cepat: Loading cepat bahkan dengan koneksi internet standar.<br>Gratis Dimainkan: Nikmati semua fitur dan level tanpa biaya tersembunyi.<br>Kompatibilitas Luas: Lancar dimainkan di PC, laptop, tablet, hingga smartphone.</p>
+    <p>BilihBasi adalah solusi sempurna bagi pecinta <strong>permainan lucu</strong> yang menginginkan variasi tanpa harus berpindah-pindah aplikasi. Setiap mini game di dalamnya dirancang untuk memberikan kepuasan instan dan memacu Anda untuk terus mencetak skor tertinggi (high score).<br>Segera buka browser Anda, kunjungi BilihBasi, dan rasakan sensasi bermain mini game seru yang akan membuat hari-hari Anda lebih berwarna. Siap untuk mengalahkan skor teman-teman Anda? Ayo mainkan BilihBasi sekarang juga!</p>
+</footer>
+</body>
+</html>
