@@ -1,0 +1,11 @@
+{
+    "name": "BilihBasi: Game permainan mini lucu",
+    "short_name": "BilihBasi",
+    "description": "BilihBasi: Permainan mini game lucu main di Browser",
+    "icons": "bilihbasi-favicon.jpeg",
+    "theme_color": "#2D2D2D",
+    "background_color": "#2D2D2D",
+    "display": "standalone",
+    "start_url": "./index.html",
+    "orientation": "portrait"
+}
